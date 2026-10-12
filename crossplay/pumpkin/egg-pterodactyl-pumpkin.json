@@ -4,7 +4,7 @@
         "version": "PTDL_v2",
         "update_url": "https:\/\/raw.githubusercontent.com\/pelican-eggs\/minecraft\/refs\/heads\/main\/crossplay\/pumpkin\/egg-pterodactyl-pumpkin.json"
     },
-    "exported_at": "2026-10-10T17:06:00+00:00",
+    "exported_at": "2026-10-12T12:29:57+00:00",
     "name": "Pumpkin",
     "author": "kubisgg@users.noreply.github.com",
     "description": "Minecraft server written in Rust with native Java and experimental Bedrock support. Pumpkin is under heavy development. Expect incomplete features and bugs.",
@@ -13,7 +13,7 @@
         "Debian": "ghcr.io\/pelican-eggs\/yolks:debian"
     },
     "file_denylist": [],
-    "startup": "BEDROCK_STATE=false; [ \"{{BEDROCK_PORT}}\" -gt 0 ] && BEDROCK_STATE=true; sed -i -e \"\/^\\[networking.java\\]$\/,\/^\\[\/s\/^address = .*\/address = \\\"0.0.0.0:{{SERVER_PORT}}\\\"\/\" -e \"\/^\\[networking.bedrock\\]$\/,\/^\\[\/s\/^enabled = .*\/enabled = ${BEDROCK_STATE}\/\" -e \"\/^\\[networking.bedrock.nethernet\\]$\/,\/^\\[\/{s\/^enabled = .*\/enabled = ${BEDROCK_STATE}\/;s\/^address = .*\/address = \\\"0.0.0.0:{{BEDROCK_PORT}}\\\"\/;}\" pumpkin.toml && exec .\/pumpkin",
+    "startup": "sed -i -e \"\/^\\[networking.java\\]$\/,\/^\\[\/s\/^address = .*\/address = \\\"0.0.0.0:{{SERVER_PORT}}\\\"\/\" -e \"\/^\\[networking.bedrock\\]$\/,\/^\\[\/s\/^enabled = .*\/enabled = {{BEDROCK_ENABLED}}\/\" -e \"\/^\\[networking.bedrock.nethernet\\]$\/,\/^\\[\/{s\/^enabled = .*\/enabled = {{BEDROCK_ENABLED}}\/;s\/^address = .*\/address = \\\"0.0.0.0:{{BEDROCK_PORT}}\\\"\/;}\" pumpkin.toml && exec .\/pumpkin",
     "config": {
         "files": "{}",
         "startup": "{\n    \"done\": \"Server is now running.\"\n}",
@@ -39,13 +39,23 @@
             "field_type": "text"
         },
         {
-            "name": "Bedrock port",
-            "description": "Set to 0 to disable Bedrock. A nonzero port automatically enables it on that port. Assign a separate allocation with both TCP and UDP, then restart to apply changes.",
-            "env_variable": "BEDROCK_PORT",
-            "default_value": "0",
+            "name": "Enable Bedrock",
+            "description": "Set to true to enable Bedrock, or false to disable it. Restart to apply changes.",
+            "env_variable": "BEDROCK_ENABLED",
+            "default_value": "false",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|integer|between:0,65535",
+            "rules": "required|in:true,false",
+            "field_type": "text"
+        },
+        {
+            "name": "Bedrock port",
+            "description": "Port used when Bedrock is enabled. Set this to a separate TCP\/UDP allocation assigned to the server. Restart to apply changes.",
+            "env_variable": "BEDROCK_PORT",
+            "default_value": "19132",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:1,65535",
             "field_type": "text"
         }
     ]

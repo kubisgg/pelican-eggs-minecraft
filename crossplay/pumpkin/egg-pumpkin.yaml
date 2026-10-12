@@ -2,7 +2,7 @@ _comment: 'DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PANEL'
 meta:
   version: PLCN_v3
   update_url: 'https://raw.githubusercontent.com/pelican-eggs/minecraft/refs/heads/main/crossplay/pumpkin/egg-pumpkin.yaml'
-exported_at: '2026-10-10T17:05:57+00:00'
+exported_at: '2026-10-12T12:29:42+00:00'
 name: Pumpkin
 author: kubisgg@users.noreply.github.com
 uuid: c6b865ed-54a5-47b0-b1d9-53b06a54f3ce
@@ -18,9 +18,16 @@ docker_images:
   Debian: 'ghcr.io/pelican-eggs/yolks:debian'
 file_denylist: {  }
 startup_commands:
-  Default: 'BEDROCK_STATE=false; [ "{{BEDROCK_PORT}}" -gt 0 ] && BEDROCK_STATE=true; sed -i -e "/^\[networking.java\]$/,/^\[/s/^address = .*/address = \"0.0.0.0:{{SERVER_PORT}}\"/" -e "/^\[networking.bedrock\]$/,/^\[/s/^enabled = .*/enabled = ${BEDROCK_STATE}/" -e "/^\[networking.bedrock.nethernet\]$/,/^\[/{s/^enabled = .*/enabled = ${BEDROCK_STATE}/;s/^address = .*/address = \"0.0.0.0:{{BEDROCK_PORT}}\"/;}" pumpkin.toml && exec ./pumpkin'
+  Default: ./pumpkin
 config:
-  files: {  }
+  files:
+    pumpkin.toml:
+      parser: toml
+      find:
+        networking.java.address: '0.0.0.0:{{server.allocations.default.port}}'
+        networking.bedrock.enabled: '{{server.environment.BEDROCK_ENABLED}}'
+        networking.bedrock.nethernet.enabled: '{{server.environment.BEDROCK_ENABLED}}'
+        networking.bedrock.nethernet.address: '0.0.0.0:{{server.environment.BEDROCK_PORT}}'
   startup:
     done: 'Server is now running.'
   logs: {  }
@@ -78,20 +85,32 @@ scripts:
     entrypoint: bash
 variables:
   -
+    sort: 1
+    name: 'Enable Bedrock'
+    description: 'Set to true to enable Bedrock, or false to disable it. Restart to apply changes.'
+    env_variable: BEDROCK_ENABLED
+    default_value: false
+    user_viewable: true
+    user_editable: true
+    rules:
+      - required
+      - 'in:true,false'
+  -
+    sort: 2
     name: 'Bedrock port'
     description: |-
-      Set to 0 to disable Bedrock. A nonzero port automatically enables it on that port. Assign a separate
-      allocation with both TCP and UDP, then restart to apply changes.
+      Port used when Bedrock is enabled. Set this to a separate TCP/UDP allocation assigned to the server.
+      Restart to apply changes.
     env_variable: BEDROCK_PORT
-    default_value: 0
+    default_value: 19132
     user_viewable: true
     user_editable: true
     rules:
       - required
       - integer
-      - 'between:0,65535'
-    sort: null
+      - 'between:1,65535'
   -
+    sort: 0
     name: 'Pumpkin version'
     description: |-
       Release to download when installing or reinstalling. Use latest for the latest stable release,
@@ -104,4 +123,3 @@ variables:
       - required
       - string
       - 'max:64'
-    sort: null

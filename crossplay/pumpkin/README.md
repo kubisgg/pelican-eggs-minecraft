@@ -20,6 +20,4 @@ Java uses the primary allocation. Bedrock requires an additional TCP/UDP allocat
 | Java | 25565 | TCP |
 | Bedrock | 19132 | TCP/UDP |
 
-The egg disables Bedrock by default with `BEDROCK_PORT=0`. Set it to the additional allocation's port to enable Bedrock.
-
 Bedrock LAN discovery on UDP 7551 is not exposed, and joining currently has a reported [NetherNet issue](https://github.com/Pumpkin-MC/Pumpkin/issues/3738).
